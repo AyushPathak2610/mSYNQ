@@ -8,7 +8,7 @@ import { Chat } from './Chat';
 import { Queue } from './Queue';
 import { ParticipantNames } from './ParticipantNames';
 import { Navbar } from './Navbar';
-import { Users, Wifi, WifiOff, Video } from 'lucide-react';
+import { Users, Wifi, WifiOff, Video, Monitor, Maximize, Minimize } from 'lucide-react';
 
 export const SyncRoom = ({ roomId, userId, username, isHost }) => {
   console.log('SyncRoom rendered:', { roomId, userId, username, isHost });
@@ -19,6 +19,7 @@ export const SyncRoom = ({ roomId, userId, username, isHost }) => {
   const [queue, setQueue] = useState({});
   const [participantCount, setParticipantCount] = useState(0);
   const [isInitializing, setIsInitializing] = useState(true);
+  const [viewMode, setViewMode] = useState('default'); // 'default', 'theater', 'fullscreen'
   
   const {
     roomState,
@@ -248,72 +249,259 @@ export const SyncRoom = ({ roomId, userId, username, isHost }) => {
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
       <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-violet-500/8 rounded-full blur-3xl pointer-events-none"></div>
 
-      <div className="container mx-auto relative z-10 px-4 pt-24 pb-6 max-w-[1600px]">
-        {/* Video Player - Centered and Responsive */}
-        <div className="mb-4">
-          {videoId && (
-            <YouTubePlayer
-              videoId={videoId}
-              onReady={handlePlayerReady}
-              onStateChange={handleStateChange}
-              playerRef={playerRef}
-            />
-          )}
+      <div className="container mx-auto relative z-10 px-4 pt-24 pb-6 max-w-[1800px]">
+        {/* View Mode Toggle */}
+        <div className="mb-4 flex justify-end gap-2">
+          <button
+            onClick={() => setViewMode('default')}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              viewMode === 'default'
+                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20'
+                : 'bg-slate-800/50 text-slate-400 hover:bg-slate-800 hover:text-white'
+            }`}
+            title="Default View"
+          >
+            <Monitor className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => setViewMode('theater')}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              viewMode === 'theater'
+                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20'
+                : 'bg-slate-800/50 text-slate-400 hover:bg-slate-800 hover:text-white'
+            }`}
+            title="Theater Mode"
+          >
+            <Maximize className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => setViewMode('fullscreen')}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              viewMode === 'fullscreen'
+                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20'
+                : 'bg-slate-800/50 text-slate-400 hover:bg-slate-800 hover:text-white'
+            }`}
+            title="Fullscreen Mode"
+          >
+            <Minimize className="w-4 h-4" />
+          </button>
         </div>
 
-        {/* Playback Controls - Below Video */}
-        <div className="mb-4">
-          <RoomControls
-            isHost={true}
-            isPlaying={roomState?.isPlaying || false}
-            onPlay={handlePlay}
-            onPause={handlePause}
-            onSeek={handleSeek}
-            currentTime={currentTime}
-          />
-        </div>
+        {/* Default Mode - YouTube style layout */}
+        {viewMode === 'default' && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            {/* Left Side - Video Player, Controls, and Input */}
+            <div className="lg:col-span-2 space-y-4">
+              {/* Video Player */}
+              <div>
+                {videoId && (
+                  <YouTubePlayer
+                    videoId={videoId}
+                    onReady={handlePlayerReady}
+                    onStateChange={handleStateChange}
+                    playerRef={playerRef}
+                  />
+                )}
+              </div>
 
-        {/* Video Input - Below Controls */}
-        <div className="mb-4 bg-slate-900/50 backdrop-blur-xl p-4 rounded-xl border border-slate-800/50">
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={videoInput}
-              onChange={(e) => setVideoInput(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleVideoChange()}
-              placeholder="Paste YouTube URL"
-              className="flex-1 px-4 py-2.5 bg-slate-950/60 border border-slate-700/50 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/30 transition-all"
-            />
-            <button
-              onClick={handleVideoChange}
-              className="px-6 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500 transition-colors font-medium text-sm whitespace-nowrap shadow-lg shadow-indigo-500/20"
-            >
-              Load
-            </button>
+              {/* Playback Controls */}
+              <div>
+                <RoomControls
+                  isHost={true}
+                  isPlaying={roomState?.isPlaying || false}
+                  onPlay={handlePlay}
+                  onPause={handlePause}
+                  onSeek={handleSeek}
+                  currentTime={currentTime}
+                />
+              </div>
+
+              {/* Video Input */}
+              <div className="bg-slate-900/50 backdrop-blur-xl p-4 rounded-xl border border-slate-800/50">
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={videoInput}
+                    onChange={(e) => setVideoInput(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleVideoChange()}
+                    placeholder="Paste YouTube URL"
+                    className="flex-1 px-4 py-2.5 bg-slate-950/60 border border-slate-700/50 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/30 transition-all"
+                  />
+                  <button
+                    onClick={handleVideoChange}
+                    className="px-6 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500 transition-colors font-medium text-sm whitespace-nowrap shadow-lg shadow-indigo-500/20"
+                  >
+                    Load
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Side - Queue and Chat Stacked */}
+            <div className="lg:col-span-1 space-y-4">
+              {/* Queue */}
+              <div className="bg-slate-900/50 backdrop-blur-xl rounded-xl border border-slate-800/50 shadow-2xl overflow-hidden">
+                <div className="h-[350px] flex flex-col">
+                  <Queue
+                    roomId={roomId}
+                    queue={queue}
+                    currentVideoId={videoId}
+                    onPlayVideo={handlePlayFromQueue}
+                  />
+                </div>
+              </div>
+              
+              {/* Chat */}
+              <div className="bg-slate-900/50 backdrop-blur-xl rounded-xl border border-slate-800/50 shadow-2xl overflow-hidden">
+                <div className="h-[350px] flex flex-col">
+                  <Chat roomId={roomId} userId={userId} username={username} />
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* Bottom Section - Queue (Left) and Chat (Right) - Equal Width */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Queue - Lower Left */}
-          <div className="bg-slate-900/50 backdrop-blur-xl rounded-xl border border-slate-800/50 shadow-2xl overflow-hidden">
-            <div className="h-[450px] flex flex-col">
-              <Queue
-                roomId={roomId}
-                queue={queue}
-                currentVideoId={videoId}
-                onPlayVideo={handlePlayFromQueue}
+        {/* Theater Mode - Wider player with content below */}
+        {viewMode === 'theater' && (
+          <div className="space-y-4">
+            {/* Video Player - Full Width */}
+            <div>
+              {videoId && (
+                <YouTubePlayer
+                  videoId={videoId}
+                  onReady={handlePlayerReady}
+                  onStateChange={handleStateChange}
+                  playerRef={playerRef}
+                />
+              )}
+            </div>
+
+            {/* Playback Controls */}
+            <div>
+              <RoomControls
+                isHost={true}
+                isPlaying={roomState?.isPlaying || false}
+                onPlay={handlePlay}
+                onPause={handlePause}
+                onSeek={handleSeek}
+                currentTime={currentTime}
               />
             </div>
-          </div>
-          
-          {/* Chat - Lower Right */}
-          <div className="bg-slate-900/50 backdrop-blur-xl rounded-xl border border-slate-800/50 shadow-2xl overflow-hidden">
-            <div className="h-[450px] flex flex-col">
-              <Chat roomId={roomId} userId={userId} username={username} />
+
+            {/* Video Input */}
+            <div className="bg-slate-900/50 backdrop-blur-xl p-4 rounded-xl border border-slate-800/50">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={videoInput}
+                  onChange={(e) => setVideoInput(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleVideoChange()}
+                  placeholder="Paste YouTube URL"
+                  className="flex-1 px-4 py-2.5 bg-slate-950/60 border border-slate-700/50 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/30 transition-all"
+                />
+                <button
+                  onClick={handleVideoChange}
+                  className="px-6 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500 transition-colors font-medium text-sm whitespace-nowrap shadow-lg shadow-indigo-500/20"
+                >
+                  Load
+                </button>
+              </div>
+            </div>
+
+            {/* Queue and Chat Below - Equal Width */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Queue */}
+              <div className="bg-slate-900/50 backdrop-blur-xl rounded-xl border border-slate-800/50 shadow-2xl overflow-hidden">
+                <div className="h-[450px] flex flex-col">
+                  <Queue
+                    roomId={roomId}
+                    queue={queue}
+                    currentVideoId={videoId}
+                    onPlayVideo={handlePlayFromQueue}
+                  />
+                </div>
+              </div>
+              
+              {/* Chat */}
+              <div className="bg-slate-900/50 backdrop-blur-xl rounded-xl border border-slate-800/50 shadow-2xl overflow-hidden">
+                <div className="h-[450px] flex flex-col">
+                  <Chat roomId={roomId} userId={userId} username={username} />
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        )}
+
+        {/* Fullscreen Mode - Maximized player with minimal UI */}
+        {viewMode === 'fullscreen' && (
+          <div className="space-y-4">
+            {/* Video Player - Large */}
+            <div className="max-w-[95%] mx-auto">
+              {videoId && (
+                <YouTubePlayer
+                  videoId={videoId}
+                  onReady={handlePlayerReady}
+                  onStateChange={handleStateChange}
+                  playerRef={playerRef}
+                />
+              )}
+            </div>
+
+            {/* Compact Controls Row */}
+            <div className="max-w-[95%] mx-auto">
+              <RoomControls
+                isHost={true}
+                isPlaying={roomState?.isPlaying || false}
+                onPlay={handlePlay}
+                onPause={handlePause}
+                onSeek={handleSeek}
+                currentTime={currentTime}
+              />
+            </div>
+
+            {/* Compact Video Input */}
+            <div className="max-w-[95%] mx-auto bg-slate-900/50 backdrop-blur-xl p-3 rounded-xl border border-slate-800/50">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={videoInput}
+                  onChange={(e) => setVideoInput(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleVideoChange()}
+                  placeholder="Paste YouTube URL"
+                  className="flex-1 px-4 py-2 bg-slate-950/60 border border-slate-700/50 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/30 transition-all"
+                />
+                <button
+                  onClick={handleVideoChange}
+                  className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500 transition-colors font-medium text-sm whitespace-nowrap shadow-lg shadow-indigo-500/20"
+                >
+                  Load
+                </button>
+              </div>
+            </div>
+
+            {/* Collapsible Queue and Chat - Smaller */}
+            <div className="max-w-[95%] mx-auto grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Queue */}
+              <div className="bg-slate-900/50 backdrop-blur-xl rounded-xl border border-slate-800/50 shadow-2xl overflow-hidden">
+                <div className="h-[300px] flex flex-col">
+                  <Queue
+                    roomId={roomId}
+                    queue={queue}
+                    currentVideoId={videoId}
+                    onPlayVideo={handlePlayFromQueue}
+                  />
+                </div>
+              </div>
+              
+              {/* Chat */}
+              <div className="bg-slate-900/50 backdrop-blur-xl rounded-xl border border-slate-800/50 shadow-2xl overflow-hidden">
+                <div className="h-[300px] flex flex-col">
+                  <Chat roomId={roomId} userId={userId} username={username} />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

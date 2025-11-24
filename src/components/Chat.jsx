@@ -1,15 +1,18 @@
 import { useState, useEffect, useRef } from 'react';
 import { ref, push, onValue, query, limitToLast } from 'firebase/database';
 import { database } from '../firebase';
-import { Send, Smile } from 'lucide-react';
+import { Send, Smile, Bell, BellOff } from 'lucide-react';
 import EmojiPicker from 'emoji-picker-react';
 
 export const Chat = ({ roomId, userId, username }) => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const messagesEndRef = useRef(null);
   const emojiPickerRef = useRef(null);
+  const previousMessageCountRef = useRef(0);
+  const isTabVisibleRef = useRef(true);
 
   // Generate consistent color for user
   const getUserColor = (username) => {
@@ -25,6 +28,29 @@ export const Chat = ({ roomId, userId, username }) => {
     return colors[hash % colors.length];
   };
 
+  // Request notification permission on mount
+  useEffect(() => {
+    if ('Notification' in window) {
+      if (Notification.permission === 'granted') {
+        setNotificationsEnabled(true);
+      } else if (Notification.permission !== 'denied') {
+        Notification.requestPermission().then(permission => {
+          setNotificationsEnabled(permission === 'granted');
+        });
+      }
+    }
+  }, []);
+
+  // Track tab visibility
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      isTabVisibleRef.current = !document.hidden;
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, []);
+
   useEffect(() => {
     if (!roomId) return;
 
@@ -37,12 +63,32 @@ export const Chat = ({ roomId, userId, username }) => {
       const data = snapshot.val();
       if (data) {
         const messageList = Object.values(data);
+        
+        // Check for new messages and show notifications
+        if (previousMessageCountRef.current > 0 && messageList.length > previousMessageCountRef.current) {
+          const newMessages = messageList.slice(previousMessageCountRef.current);
+          
+          // Show notification for each new message (excluding own messages)
+          newMessages.forEach(msg => {
+            if (msg.userId !== userId && notificationsEnabled && !isTabVisibleRef.current) {
+              new Notification('New message from ' + msg.username, {
+                body: msg.text,
+                icon: '/favicon.ico',
+                badge: '/favicon.ico',
+                tag: 'chat-message',
+                renotify: false
+              });
+            }
+          });
+        }
+        
+        previousMessageCountRef.current = messageList.length;
         setMessages(messageList);
       }
     });
 
     return () => unsubscribe();
-  }, [roomId]);
+  }, [roomId, userId, notificationsEnabled]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -88,7 +134,27 @@ export const Chat = ({ roomId, userId, username }) => {
             <Send size={14} className="text-indigo-400" />
             <h3 className="font-medium text-sm text-slate-300">Chat</h3>
           </div>
-          <span className="text-xs text-slate-600">{messages.length}</span>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={async () => {
+                if (!notificationsEnabled && 'Notification' in window) {
+                  const permission = await Notification.requestPermission();
+                  setNotificationsEnabled(permission === 'granted');
+                } else {
+                  setNotificationsEnabled(!notificationsEnabled);
+                }
+              }}
+              className={`p-1.5 rounded-lg transition-colors ${
+                notificationsEnabled
+                  ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/30'
+                  : 'bg-slate-800/50 hover:bg-slate-800 text-slate-500 border border-slate-700/50'
+              }`}
+              title={notificationsEnabled ? 'Notifications enabled' : 'Enable notifications'}
+            >
+              {notificationsEnabled ? <Bell size={12} /> : <BellOff size={12} />}
+            </button>
+            <span className="text-xs text-slate-600">{messages.length}</span>
+          </div>
         </div>
       </div>
       
