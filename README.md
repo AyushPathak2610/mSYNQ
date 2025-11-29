@@ -339,14 +339,6 @@ MIT
 - Tailwind CSS
 - emoji-picker-react
 
-## 📞 Support
-
-Having issues? Check:
-1. [TROUBLESHOOTING.md](TROUBLESHOOTING.md) - Common issues
-2. [TESTING.md](TESTING.md) - Test scenarios
-3. Browser console (F12) - Error messages
-4. Firebase Console - Database status
-
 ## 🎉 What's Next?
 
 Future enhancements:
