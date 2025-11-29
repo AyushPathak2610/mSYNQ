@@ -1,4 +1,4 @@
-# 🎬 mSYNQ - Watch Together in Perfect Sync
+# <img src="public/icon.png" alt="mSYNQ" width="32" height="32" style="vertical-align: middle;"> mSYNQ - Watch Together in Perfect Sync
 
 A complete, production-ready real-time synchronized video playback application that allows multiple users to watch YouTube videos together with perfect synchronization (±200ms). **Everyone can control playback collaboratively!**
 
