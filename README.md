@@ -364,4 +364,3 @@ Future enhancements:
 
 **Live at:** https://msynq-f81a4.web.app/
 
-**Total Features:** 100+ | **Documentation:** 15 files | **Lines of Code:** ~2,000
