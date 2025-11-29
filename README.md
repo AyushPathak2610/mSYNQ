@@ -32,8 +32,10 @@ Try it now - create a room and share with friends!
 ### User Experience
 - ✅ **Mobile Responsive** - Works on all devices
 - ✅ **Connection Status** - Visual indicators for sync and connection
-- ✅ **Clean UI** - Modern design with Tailwind CSS
+- ✅ **Clean UI** - Modern design with Tailwind CSS and branded logo
 - ✅ **Fast Loading** - Optimized with Vite
+- ✅ **Multiple View Modes** - Default, Theater, and Fullscreen viewing options
+- ✅ **Branded Navigation** - mSYNQ logo displayed in navbar
 
 ## 🚀 Quick Start
 

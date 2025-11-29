@@ -23,6 +23,11 @@ export const Navbar = ({
         <div className="flex items-center gap-3 h-12">
           {/* Left side - Logo and Name - ALWAYS VISIBLE */}
           <div className="flex items-center gap-2 flex-shrink-0">
+            <img 
+              src="/icon.png" 
+              alt="mSYNQ Logo" 
+              className="h-8 w-8 object-contain"
+            />
             <span className="text-sm font-light bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent tracking-wide whitespace-nowrap">
               mSYNQ
             </span>

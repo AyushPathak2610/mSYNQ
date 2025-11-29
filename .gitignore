@@ -41,5 +41,8 @@ ui-debug.log
 Thumbs.db
 
 # Internal documentation (not for public repo)
-FIX_DEPLOYMENT_ISSUE.md
-GITHUB_PUSH_INSTRUCTIONS.md
+# Ignore all .md files in root except README.md
+*.md
+!README.md
+COMMIT_MESSAGE.txt
+COMMIT_SUMMARY.txt
