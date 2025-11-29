@@ -41,8 +41,9 @@ ui-debug.log
 Thumbs.db
 
 # Internal documentation (not for public repo)
-# Ignore all .md files in root except README.md
+# Ignore all .md files in root except README.md and CONTRIBUTING.md
 *.md
 !README.md
+!CONTRIBUTING.md
 COMMIT_MESSAGE.txt
 COMMIT_SUMMARY.txt
